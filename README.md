@@ -4,7 +4,7 @@ A full-stack inventory reservation platform built for the Allo Engineering Take-
 
 ## Live Demo
 
-Add your deployed Vercel URL here after deployment.
+https://allo-reservation-system-sage.vercel.app
 
 ---
 
