@@ -1,36 +1,167 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Allo Inventory Reservation System
 
-## Getting Started
+A full-stack inventory reservation platform built for the Allo Engineering Take-Home Assignment.
 
-First, run the development server:
+## Live Demo
+
+Add your deployed Vercel URL here after deployment.
+
+---
+
+# Features
+
+- Product inventory management
+- Multi-warehouse stock tracking
+- Reservation system with expiry
+- Reservation confirmation
+- Reservation release/cancellation
+- Concurrency-safe inventory reservation
+- Live countdown timer
+- Automatic stock restoration on expiry
+- Modern responsive UI
+
+---
+
+# Tech Stack
+
+## Frontend
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+
+## Backend
+- Next.js API Routes
+- Prisma ORM
+- PostgreSQL (Supabase)
+
+## Deployment
+- Vercel
+- Supabase
+
+---
+
+# Database Design
+
+## Product
+Stores product information.
+
+## Warehouse
+Stores warehouse information.
+
+## Inventory
+Tracks stock per product per warehouse.
+
+Fields:
+- totalUnits
+- reservedUnits
+
+Available stock is calculated as:
+
+availableUnits = totalUnits - reservedUnits
+
+## Reservation
+Tracks temporary reservations.
+
+Statuses:
+- PENDING
+- CONFIRMED
+- RELEASED
+
+---
+
+# Concurrency Handling
+
+The reservation endpoint is implemented using Prisma database transactions.
+
+When a reservation request is made:
+
+1. Inventory is fetched inside a transaction
+2. Available stock is calculated
+3. If stock is insufficient, API returns 409
+4. Otherwise reservedUnits is incremented
+5. Reservation record is created
+
+This prevents overselling when multiple requests attempt to reserve the same inventory simultaneously.
+
+---
+
+# Reservation Expiry
+
+Reservations expire after 10 minutes.
+
+Expired reservations are automatically released using lazy cleanup logic.
+
+Whenever products are fetched:
+- expired PENDING reservations are detected
+- reserved stock is restored
+- reservation status becomes RELEASED
+
+---
+
+# API Endpoints
+
+## GET /api/products
+Returns all products with warehouse inventory.
+
+## GET /api/warehouses
+Returns all warehouses.
+
+## POST /api/reservations
+Creates reservation.
+
+Returns:
+- 409 if stock unavailable
+
+## POST /api/reservations/:id/confirm
+Confirms reservation.
+
+Returns:
+- 410 if reservation expired
+
+## POST /api/reservations/:id/release
+Releases reservation early.
+
+---
+
+# Local Setup
+
+## 1. Clone repository
 
 ```bash
+git clone <repo-url>
+2. Install dependencies
+npm install
+3. Configure environment variables
+
+Create .env
+
+DATABASE_URL=your_supabase_connection_string
+4. Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Tradeoffs / Improvements
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+If given more time, I would improve:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+background job based expiry cleanup using Vercel Cron
+Redis-based distributed locking
+Idempotency keys
+Authentication
+Better analytics/dashboard
+Unit and integration testing
+Optimistic UI updates
+Better mobile responsiveness
+Author
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Anshika Babel
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# NOW SAVE FILE
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Then run:
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+git add .
+git commit -m "Updated README"
+git push
